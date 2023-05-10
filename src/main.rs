@@ -69,12 +69,15 @@ fn handle_client(mut stream: TcpStream) {
 }
 
 fn handle_post_request(request: &str) -> (String, String) {
-    match (get_user_request_body(&request), Client::connect(DB_URL, NoTls)) {
+    match (
+        get_user_request_body(&request),
+        Client::connect(DB_URL, NoTls),
+    ) {
         (Ok(user), Ok(mut client)) => {
             client
                 .execute(
                     "INSERT INTO users (name, email) VALUES ($1, $2)",
-                    &[&user.name, &user.email]
+                    &[&user.name, &user.email],
                 )
                 .unwrap();
 
