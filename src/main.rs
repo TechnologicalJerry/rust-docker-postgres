@@ -13,3 +13,5 @@ struct User {
     name: String,
     email: String,
 }
+
+const DB_URL: &str = env!("DATABASE_URL");
