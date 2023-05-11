@@ -113,3 +113,22 @@ fn handle_get_request(request: &str) -> (String, String) {
         _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
     }
 }
+
+fn handle_get_all_request(request: &str) -> (String, String) {
+    match Client::connect(DB_URL, NoTls) {
+        Ok(mut client) => {
+            let mut users = Vec::new();
+
+            for row in client.query("SELECT * FROM users", &[]).unwrap() {
+                users.push(User {
+                    id: row.get(0),
+                    name: row.get(1),
+                    email: row.get(2),
+                });
+            }
+
+            (OK_RESPONSE.to_string(), serde_json::to_string(&users).unwrap())
+        }
+        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+    }
+}
