@@ -175,3 +175,30 @@ fn handle_delete_request(request: &str) -> (String, String) {
         _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
     }
 }
+
+fn set_database() -> Result<(), PostgresError> {
+    let mut client = Client::connect(DB_URL, NoTls)?;
+
+    client.batch_execute(
+        "CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR NOT NULL,
+            email VARCHAR NOT NULL
+        )",
+    )?;
+    Ok(())
+}
+
+fn get_id(request: &str) -> &str {
+    request
+        .split("/")
+        .nth(2)
+        .unwrap_or_default()
+        .split_whitespace()
+        .next()
+        .unwrap_or_default()
+}
+
+fn get_user_request_body(request: &str) -> Result<User, serde_json::Error> {
+    serde_json::from_str(request.split("\r\n\r\n").last().unwrap_or_default())
+}
