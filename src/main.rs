@@ -88,8 +88,11 @@ fn handle_post_request(request: &str) -> (String, String) {
 }
 
 fn handle_get_request(request: &str) -> (String, String) {
-    match (get_id(&request).parse::<i32>(), Client::connect(DB_URL, NoTls)) {
-        (Ok(id), Ok(mut client)) =>
+    match (
+        get_id(&request).parse::<i32>(),
+        Client::connect(DB_URL, NoTls),
+    ) {
+        (Ok(id), Ok(mut client)) => {
             match client.query_one("SELECT * FROM users WHERE id = $1", &[&id]) {
                 Ok(row) => {
                     let user = User {
@@ -98,10 +101,14 @@ fn handle_get_request(request: &str) -> (String, String) {
                         email: row.get(2),
                     };
 
-                    (OK_RESPONSE.to_string(), serde_json::to_string(&user).unwrap())
+                    (
+                        OK_RESPONSE.to_string(),
+                        serde_json::to_string(&user).unwrap(),
+                    )
                 }
                 _ => (NOT_FOUND.to_string(), "User not found".to_string()),
             }
+        }
 
         _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
     }
