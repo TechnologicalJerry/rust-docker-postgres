@@ -127,7 +127,10 @@ fn handle_get_all_request(request: &str) -> (String, String) {
                 });
             }
 
-            (OK_RESPONSE.to_string(), serde_json::to_string(&users).unwrap())
+            (
+                OK_RESPONSE.to_string(),
+                serde_json::to_string(&users).unwrap(),
+            )
         }
         _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
     }
